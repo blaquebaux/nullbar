@@ -1,0 +1,56 @@
+# Blaque Baux Nullbar
+
+**The family's universal null-testing gate. Every sleeve's verdict should survive it.**
+
+`nullbar` answers three questions about any strategy — from its own daily positions and the asset returns, no new data —
+and returns a **PASS / FLAG / FAIL** with the diagnostics. It's the formalization of the standing house rule: *an
+extraordinary result is a red flag until it clears the null.*
+
+> **Not investment advice.** Educational/research software. See [DISCLAIMER](DISCLAIMER.md) and [LICENSE](LICENSE).
+
+```python
+from nullbar import gate
+g = gate(pos, asset_rets, hold=21, cost=2e-4)   # pos: daily position/signal series; asset_rets: daily returns traded
+print(g["verdict"])                             # PASS / FLAG / FAIL + sharpe, eff trades, VIF, NW t-stat, cluster-p, beats-random
+```
+```bash
+python3 nullbar.py   # demo (needs Alpaca data keys) — shows the gate on a planted edge, noise, and an overlap trap
+```
+
+## The three tests
+
+1. **Random-entry baseline** — does the *signal* beat taking the **same trade** (same hold, same cost) from **every
+   bar**? That every-bar baseline is the limit of infinitely many random entries; a signal that doesn't beat it is
+   timing nothing, just collecting the asset's drift. (`beats_random_entry` → want ≳ 0.90.)
+2. **Cluster-corrected "band of luck"** — circularly shift the whole position pattern through time thousands of times,
+   keeping the signals' spacing/clustering intact, and rebuild the P&L each shift. The actual book's percentile in that
+   band is a p-value that — unlike a naive t-stat — is **not inflated by overlapping/clustered trades**. (`cluster_p` →
+   want < 0.05.)
+3. **Effective N** — how many *independent* trades you really have. Every in-market bar starts a notional hold-day
+   trade; those trades **overlap** (consecutive ones share hold−1 days), so the trade-return series is autocorrelated.
+   Effective N = naive / Bartlett-VIF — overlap → VIF ≫ 1 → **eff ≪ naive**. Plus a Newey-West t-stat on the daily P&L.
+   (`eff_trades` → want ≳ 20; `nw_tstat` → want |t| > 2.)
+
+## Demo output (SPY, 2016–2026)
+
+| signal | verdict | Sharpe | naive→effective | significance |
+|---|---|---|---|---|
+| planted-edge oracle *(look-ahead, demo only)* | **PASS** | +13.78 | 2657→**1976** | cluster-p 0.000, beats-random 1.0 |
+| pure-noise timing | **FAIL** | −0.32 | 2657→2673 | cluster-p 0.84, beats-random 0.0 |
+| always-long (overlap, h=63) | **FAIL** | +0.88 | 2595→**75** (VIF 34.8) | cluster-p 1.00, beats-random 0.48 |
+
+The gate recognizes a genuine edge (planted), rejects noise, and exposes the **overlap trap**: an always-long book's
+2,595 "trades" collapse to **75 effective** — its significance is *one long beta bet*, not many independent trades, and
+it doesn't beat random entry (it's beta, not timing alpha).
+
+## Use it as a universal gate
+
+Run `gate(...)` on every sleeve's book. A result that **fails here is luck, clustering, or beta — not alpha.** It is the
+counterpart to the family's recurring findings (e.g. `brunt`'s Sharpe-13 artifact, `beaming`'s fill artifact,
+`bollinger`'s selection) — a single, reusable check that turns "looks good" into "survives the null." `nullbar_2` =
+block-bootstrap confidence intervals + a multiple-testing (deflated-Sharpe) correction across the whole corpus.
+
+## Status
+
+**Toolkit.** Pure-NumPy, deterministic (seeded), importable; core functions take plain arrays (no data dependency), the
+demo fetches SPY. Not a sleeve — a gate for all of them.
