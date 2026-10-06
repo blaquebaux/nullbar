@@ -114,3 +114,25 @@ Ran the sign-stability audit on the two most control-dependent verdicts (see `mi
 
 **Action:** fold the burdensome finding back into its README (downgrade the "distinct" language), and run mirage on the
 other control-based verdicts (`bifurcate`, `boulder`, `bigbrother`) before any capital logic.
+
+---
+
+# STATUS UPDATE (Oct 6 2026) — all modules BUILT
+
+Every spec above is now a runnable module in this repo (Python prototype; port to Julia `base` where the data lives):
+`friction.py` · `ledger.py` · `breakthrough.py` · `sleevemap.py` · `stress_wrapper.py` (+ earlier `nullbar/validation/stress/mirage`).
+
+**Two demo findings worth acting on** (stylized inputs, but the lesson is real — re-run with the real sleeve returns):
+
+- **Corpus FDR (`ledger.py`)**: with ~55 sleeves, the **expected max Sharpe by luck alone is ≈ +0.89**. Over a realistic
+  corpus (50 null + 5 real), only a ~1.2-Sharpe sleeve (bankroll-like) clears Benjamini-Hochberg q<0.10 — the **mid-tier
+  "keepers" (Sharpe 0.35–0.61: borough, bulwark, blend-crack, bullion-RV) do NOT survive family-wise FDR**, and a lucky
+  null can sneak in. This confirms the standing skepticism: across 55 shots, only the strongest edge is real; the rest is
+  selection luck until proven otherwise.
+- **Sleeve map (`sleevemap.py`)**: a 6-keeper proxy book shows **~1.8 effective bets, 68% factor-R², ~0 residual alpha** —
+  the "diversified" book is largely MKT/low-vol/momentum beta wearing six names. Allocate on the *residual*, collapse
+  correlated clusters to one risk budget.
+
+**Next real step (not a demo):** run `ledger.corpus_fdr` and `sleevemap` on the *actual* returns of all ~55 sleeves — it
+will almost certainly cut the keeper list and show the book is more concentrated than it looks. That's the honest
+corpus-level verdict the individual sleeve READMEs can't give.

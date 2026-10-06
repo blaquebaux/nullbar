@@ -115,3 +115,12 @@ per-sleeve rationale field it can't automate.
 
 See **[SPECS.md](SPECS.md)** for the full governed pipeline and the specs for the modules still to build (Friction,
 corpus-wide FDR + pre-registration ledger, Breakthrough shrinkage, sleeve-correlation/factor map, Stress-wrapper).
+
+## Complete suite (Oct 2026)
+
+All layers are now built: `nullbar.py` (entry/overlap) · `validation.py` (PBO/DSR/edge-decay/Basso/Monte-Carlo) ·
+`mirage.py` (specification) · `stress.py` (structural diagnostics) · `friction.py` (Almgren-Chriss impact + capacity) ·
+`ledger.py` (pre-registration + corpus-wide FDR) · `breakthrough.py` (robustness-shrinkage allocator) ·
+`sleevemap.py` (correlation + factor map) · `stress_wrapper.py` (regime filter/inversion). Run each file for its demo; see
+[SPECS.md](SPECS.md) for the governed pipeline and two corpus-level findings (most mid-tier keepers don't survive
+family-wise FDR; the keeper book is ~1.8 effective bets). Port to the Julia `base` engine for the real data feeds.
