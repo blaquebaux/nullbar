@@ -136,3 +136,34 @@ Every spec above is now a runnable module in this repo (Python prototype; port t
 **Next real step (not a demo):** run `ledger.corpus_fdr` and `sleevemap` on the *actual* returns of all ~55 sleeves — it
 will almost certainly cut the keeper list and show the book is more concentrated than it looks. That's the honest
 corpus-level verdict the individual sleeve READMEs can't give.
+
+---
+
+# REAL-RETURNS CORPUS AUDIT (Oct 6 2026) — ran it on the actual corpus
+
+Replaces the stylized demo above with the real numbers. Also ported the whole toolkit into the canonical Julia engine
+(`blaquebaux/base` → `src/module_14_nullbar`, `module Nullbar`, stdlib-only; verified standalone).
+
+**1. Corpus FDR on the real ~44 independent sleeve tests** (infra/capstones/known artifacts excluded; top candidates'
+headline Sharpes verified NET from each README's verdict):
+
+- **Expected max Sharpe by luck alone ≈ +0.93.** Any single sleeve under ~0.9 Sharpe is statistically indistinguishable
+  from the best-of-luck draw across 44 shots.
+- On **raw strategy Sharpe**, ~12 sleeves "survive" BH q<0.10 — but that list is polluted: `bridle`/`blemish`/`baton`
+  are *documented nulls* whose high Sharpe is the **raw asset** (high-β BAB, quality factor), not an edge; and
+  `bull`/`broad`/`bitdollar` are **factor beta** (corr≈1), not alpha. The pollution is the lesson — raw Sharpe ranks beta.
+- On **edge-over-benchmark (alpha) Sharpe**, with documented nulls set to 0 and beta sleeves reduced to residual, only
+  **4 survive family-wise BH (q<0.10, p-threshold 0.0075): `bankroll` (+1.08), `blunt` (+1.00), `buzz` (+0.88),
+  `bind` (+0.86)** — and `buzz`/`bind` are **not yet mirage-audited**. The confirmed, spec-robust, non-beta, FDR-surviving
+  edges are therefore **just `bankroll` and `blunt`** pending a mirage pass on the other two.
+- **`boom` (+0.55 beta-neutral momentum) is a genuine edge but does NOT survive** family-wise (p≈0.06 > 0.0075) — real,
+  yet not distinguishable from luck once you count all 44 shots. The honest fate of a mid-tier edge in a large corpus.
+
+**2. Sleeve map on the real keeper proxies (live Alpaca):** the 6-sleeve proxy book = **1.8 effective bets, +0.48 avg
+pairwise corr, 68% factor-R², residual alpha +0.7%/yr, residual Sharpe ≈ 0.00.** Betas: MKT +0.63, LOWVOL +0.20,
+MOM +0.19. Three sleeves collapse into one cluster. The "diversified" book is MKT+low-vol+momentum beta wearing six names.
+
+**Bottom line:** across the real corpus, **2 confirmed diversifying edges** (bankroll, blunt), 2 FDR-survivors pending
+mirage (buzz, bind), and a keeper book that is ~1.8 independent bets of mostly factor beta. This is the corpus-level
+verdict the individual READMEs can't give — and it's exactly what the `breakthrough` shrinkage allocator is built to act
+on: shrink the beta/lucky sleeves toward zero, size the few residual edges. Headline Sharpe drops; honest Sharpe rises.
