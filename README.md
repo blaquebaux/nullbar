@@ -101,3 +101,17 @@ python3 stress.py       # structural layer demo (synthetic, no data)
 **The full loop:** signal (nullbar.gate) → selection (PBO, DSR) → decay (edge_decay) → execution (Basso, Monte Carlo) →
 structure (stress.py). A sleeve that clears every layer has earned its verdict; one that fails any is luck, clustering,
 beta, selection, or a backfill illusion — not alpha. `nullbar_2` = wire `falsify()` as a CI gate across the whole corpus.
+
+## `mirage.py` — specification / factor-mirage audit
+
+Asks the question significance tests can't: **are the variables structurally correct, or does a bad control improve fit
+while flipping/collapsing the coefficient?** (Leamer extreme-bounds + bad-control diagnostics.) `specification_audit`
+re-estimates the regression across **all control subsets** and reports alpha sign-stability + extreme bounds, each
+control's marginal ΔR² vs Δalpha (a mirage control raises R² while killing alpha, collinear with the target), and a
+ROBUST / FRAGILE / NULL / MIRAGE verdict. First audits (see `mirage.py`): **burdensome** "distinct from puts" came back
+**FRAGILE** (raw +16%/yr alpha collapses to +2.6%, significant in only 2% of specs — largely equity/quality/credit beta);
+**blemish** came back **robustly NULL** (confirmed). The qualitative half — *why* each variable is in/out — is a required
+per-sleeve rationale field it can't automate.
+
+See **[SPECS.md](SPECS.md)** for the full governed pipeline and the specs for the modules still to build (Friction,
+corpus-wide FDR + pre-registration ledger, Breakthrough shrinkage, sleeve-correlation/factor map, Stress-wrapper).
