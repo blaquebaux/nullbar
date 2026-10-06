@@ -54,3 +54,50 @@ block-bootstrap confidence intervals + a multiple-testing (deflated-Sharpe) corr
 
 **Toolkit.** Pure-NumPy, deterministic (seeded), importable; core functions take plain arrays (no data dependency), the
 demo fetches SPY. Not a sleeve — a gate for all of them.
+
+---
+
+# Expanded suite (Oct 2026): selection-bias, execution & structural layers
+
+`nullbar.gate` is the **entry/overlap** layer. Two companion modules complete the loop.
+
+## `validation.py` — selection-bias & execution
+
+| function | question | fail |
+|---|---|---|
+| `deflated_sharpe` | is the Sharpe just the MAX of many trials? (Bailey–López de Prado) | DSR < 0.5 |
+| `pbo_cscv` | given everything tried, is the SELECTED strategy overfit? (CSCV) | PBO > 0.5 |
+| `edge_decay` | how much edge survives IS→OOS? (consistency-weighted grade) | grade D/F |
+| `basso_random_entry` | does trade MANAGEMENT alone profit (no entry rule)? | profit factor ≈ 1 |
+| `monte_carlo_trades` | how wide is the luck-of-sequencing distribution? | CI overlaps zero |
+| `falsify(...)` | stacks all of the above **+ nullbar.gate** into one PASS/FAIL | any layer fails |
+
+Demo (SPY): PBO separates stable real-skill selection (~0.14) from noise (~0.37); DSR deflates a lucky best-of-60 Sharpe
+as the honest trial count rises; Basso shows random entry + a trailing stop ≈ breakeven-to-positive in a trend — *the
+exit is the edge, not the entry.*
+
+## `stress.py` — structural / failure-mode layer
+
+Significance is necessary, not sufficient. Four checks Sharpe/PBO/DSR can't make:
+
+- **`point_in_time`** — evaluate on the date data *arrived*, not the date it *describes*; vendor panels backfill
+  entities/corrected maps across history, so a backtest "knows" what the analyst that day couldn't. Latency is a
+  distribution — test the tail.
+- **`failure_mode`** (registry) — different strategy *species* fail differently (stat-arb → short squeeze; trend → chop +
+  synchronized vol-target deleveraging; market-neutral → basis + crowding). Classify first, stress the type's killer; one
+  ruler across all is false comfort.
+- **`second_order_crowding`** — when *shorting itself* is the crowded trade (Oct-2025 quant quake): on days the
+  most-shorted basket rallies, does the short leg take synchronized, non-linear losses? (The mechanism `bevy` couldn't see
+  on large-cap post-2009 data — the short side as the squeeze source.)
+- **`corroboration_score`** — structural vs statistical alpha: many *independent configs agreeing* (structural, robust to
+  spec) beats one razor-tuned fit (statistical, overfit) — in prior work corroborating-config count was +0.40 with
+  realized return while per-config fit was −0.33.
+
+```bash
+python3 validation.py   # selection-bias & execution demo (needs Alpaca keys)
+python3 stress.py       # structural layer demo (synthetic, no data)
+```
+
+**The full loop:** signal (nullbar.gate) → selection (PBO, DSR) → decay (edge_decay) → execution (Basso, Monte Carlo) →
+structure (stress.py). A sleeve that clears every layer has earned its verdict; one that fails any is luck, clustering,
+beta, selection, or a backfill illusion — not alpha. `nullbar_2` = wire `falsify()` as a CI gate across the whole corpus.
