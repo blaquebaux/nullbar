@@ -60,3 +60,25 @@ if __name__=="__main__":
     print("   betas: "+", ".join(f"{f} {b:+.2f}" for f,b in fx["betas"].items()))
     print("\nREAD: if effective-bets ≪ sleeve-count and factor-R² is high, the 'diversified' book is mostly factor beta in")
     print("  disguise. Allocate on the RESIDUAL (diversifying) alpha, and collapse correlated clusters to one risk budget.")
+
+
+# ---- toolkit batch-2 additions ------------------------------------------------
+def forecast_encompassing(realized, f1, f2):
+    """Fair-Shiller / Harvey-Leybourne-Newbold forecast encompassing. Regress realized returns
+    on [1, f1, f2]. If f2's coefficient is insignificant given f1, forecast f1 ENCOMPASSES f2
+    (f2 is redundant); if both are significant the forecasts carry non-redundant information
+    and combining adds value. Operates at the forecast level, where portfolio construction
+    happens - complementary to the factor-level correlation map."""
+    y = np.asarray(realized, float); a = np.asarray(f1, float); b = np.asarray(f2, float)
+    L = min(len(y), len(a), len(b)); y, a, b = y[-L:], a[-L:], b[-L:]
+    X = np.column_stack([np.ones(L), a, b]); beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    resid = y - X @ beta; dof = max(L - 3, 1); s2 = float(resid @ resid) / dof
+    se = np.sqrt(np.diag(s2 * np.linalg.inv(X.T @ X))); t = beta / se
+    enc12 = abs(t[2]) < 2.0; enc21 = abs(t[1]) < 2.0
+    if enc12 and not enc21:       v = "F1 ENCOMPASSES F2 (f2 redundant - drop it)"
+    elif enc21 and not enc12:     v = "F2 ENCOMPASSES F1 (f1 redundant - drop it)"
+    elif not enc12 and not enc21: v = "NEITHER ENCOMPASSES (both add - combine)"
+    else:                         v = "BOTH WEAK (neither forecast is significant)"
+    return dict(t_f1=float(t[1]), t_f2=float(t[2]),
+                betas=dict(const=float(beta[0]), f1=float(beta[1]), f2=float(beta[2])),
+                combine=(not enc12 and not enc21), verdict=v)

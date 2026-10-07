@@ -86,3 +86,21 @@ if __name__ == "__main__":
     print(f"\n  SURVIVORS (BH q=0.10): {surv}")
     print("  READ: of a realistic corpus, only the genuinely-strong Sharpes clear family-wise FDR; mid-tier 'keepers'")
     print("  (e.g. a 0.35-0.46 Sharpe) often DON'T survive once you count all ~55 shots — exactly the 1-2 we flagged.")
+
+
+# ---- toolkit batch-2 additions ------------------------------------------------
+def monotone_corpus_bar(trial_sharpes, var_floor=None, ppy=252):
+    """Search-gaming defense for the FDR/DSR bar. Once the multiple-testing correction is INSIDE
+    the search loop, a budgeted search can dilute its own bar: funding a near-mean trial raises
+    N (easing the correction) while barely moving the trial-Sharpe dispersion. Two pre-registered
+    guards: a variance FLOOR that bounds dilution, and a MONOTONE high-water-mark bar that never
+    decreases as trials accumulate. Returns the bar sequence (expected-max-Sharpe, non-decreasing)."""
+    srs = np.asarray(trial_sharpes, float); g = 0.5772156649
+    bar = []; hwm = 0.0
+    for n in range(1, len(srs) + 1):
+        sd = srs[:n].std() / math.sqrt(ppy)
+        if var_floor is not None: sd = max(sd, var_floor)
+        emax = sd * ((1 - g) * _invnorm(1 - 1.0 / n) + g * _invnorm(1 - 1.0 / (n * math.e))) * math.sqrt(ppy) if n > 1 else 0.0
+        hwm = max(hwm, emax); bar.append(hwm)
+    return dict(monotone_bar=bar, final_bar=bar[-1] if bar else 0.0, var_floor=var_floor,
+                note="a diluting near-mean trial can no longer LOWER the bar")

@@ -167,3 +167,41 @@ MOM +0.19. Three sleeves collapse into one cluster. The "diversified" book is MK
 mirage (buzz, bind), and a keeper book that is ~1.8 independent bets of mostly factor beta. This is the corpus-level
 verdict the individual READMEs can't give — and it's exactly what the `breakthrough` shrinkage allocator is built to act
 on: shrink the beta/lucky sleeves toward zero, size the few residual edges. Headline Sharpe drops; honest Sharpe rises.
+
+---
+
+# TOOLKIT BATCH-2 (Oct 7 2026) — eight new gates
+
+Eight additions beyond the original pipeline, built from a triage of a large proposal list.
+**Honesty note:** the proposal cited several 2026 "papers/packages" (LAZARUS, holdout-first,
+monte-neo, DeePM, an MSCI note) that could not be verified; these are built on the *established
+methods* behind them (CUSUM, Hansen SPA, Harvey-Leybourne-Newbold / Fair-Shiller encompassing,
+Leamer EBA, the Harvey-Liu haircut, robustness/plateau scoring, McCloskey-Ziliak, lookahead
+gates, trades-per-parameter), not on the unverifiable claims. Dupes were merged (search-gaming
+appeared 3×, encompassing 2×, CUSUM 2×); two proposed "additions" were sleeves, not layers
+(term-structure momentum, prediction-market OFI) and are parked for the `start <name>` track;
+RF+SHAP regime decomposition and a critical-slowing EWS were deferred (break stdlib-only / too
+speculative). All eight below are runnable in `nullbar` (Python) and ported to Julia `base`
+(module_14, `module Nullbar`), stdlib-only, smoke-tested.
+
+| # | gate | module | catches |
+|---|---|---|---|
+| 1 | `prefix_invariance` (lookahead gate) | `causality.py` | a position that changes when future bars appear — look-ahead DSR/PBO can't see |
+| 2 | `parameter_budget` | `validation.py` | degrees-of-freedom overfit (trades-per-parameter < 50:1) |
+| 3 | `plateau_score` | `validation.py` | peak-selection overfit (isolated spike vs broad ridge) |
+| 4 | `economic_significance` | `economic.py` | statistically real but economically trivial alpha (pre-registered hurdle) |
+| 5 | `sharpe_haircut` | `breakthrough.py` | uniform multiple-testing penalty — the haircut is nonlinear (brutal on 0.4s, mild on 1.0s) |
+| 6 | `forecast_encompassing` | `sleevemap.py` | redundant keepers (does edge A encompass edge B at the forecast level) |
+| 7 | `monotone_corpus_bar` | `ledger.py` | a search gaming its own FDR bar by diluting N — variance floor + monotone high-water-mark |
+| 8 | `asset_attribution` / `universe_attribution` | `attribution.py` | **new layer** — alpha that is asset-selection, not logic (fix logic, vary universe) |
+
+**Most consequential for the corpus:** #4 (economic gate) and #6 (encompassing). The economic
+hurdle can cut a statistically-significant-but-trivial "survivor"; encompassing asks whether the
+two confirmed edges (bankroll, blunt) are genuinely independent or one encompasses the other —
+the next real-returns check to run once their forecast series are persisted.
+
+**Still parked** (deliberately): CUSUM live-break monitor and regime-dependence diagnostic
+(need a live book / overlap existing layers), Step-SPA (heavier bootstrap, small corpus),
+data-correction provenance and causal-sieve (cheap, low urgency), the leakage-safe search
+registry and monotone-bar enforcement inside an automated loop (belong to a future
+"base automates discovery" project), and the two new sleeves above.

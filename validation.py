@@ -166,3 +166,30 @@ if __name__=="__main__":
     print("  trial count rises (0.99→0.82; with more trials or a less-lucky draw it crosses below the 0.5 fail line). Basso")
     print("  shows random entry + a trailing stop ≈ breakeven-to-positive in a trending tape — the ENTRY adds little, the EXIT")
     print("  carries it. Stack all via falsify() — a strategy must clear EVERY layer: entry, selection, decay, execution.")
+
+
+# ---- toolkit batch-2 additions ------------------------------------------------
+def parameter_budget(n_trades, n_params, min_ratio=50.0):
+    """Degrees-of-freedom discipline. The observation that counts for a trading rule is a
+    TRADE, not a bar; every free parameter is an axis to fit noise. Reject below min_ratio
+    trades per parameter (default 50:1) regardless of what PBO says."""
+    ratio = n_trades / max(n_params, 1)
+    return dict(n_trades=n_trades, n_params=n_params, ratio=float(ratio),
+                min_ratio=min_ratio, passes=ratio >= min_ratio,
+                verdict="OK" if ratio >= min_ratio else "OVERFIT-RISK (too few trades per parameter)")
+
+def plateau_score(grid):
+    """Peak-vs-ridge audit of a parameter sweep. grid: 2D array of a performance metric over
+    two swept parameters. A real edge sits on a broad ridge; an overfit one is an isolated
+    spike. Score in [0,1]: 1 => the best cell's neighbours are nearly as good (ridge);
+    0 => neighbours sink to the grid mean (spike - noise given a name)."""
+    G = np.asarray(grid, float)
+    i, j = np.unravel_index(np.nanargmax(G), G.shape)
+    peak = float(G[i, j]); gmean = float(np.nanmean(G))
+    nb = [G[i+di, j+dj] for di, dj in ((1,0),(-1,0),(0,1),(0,-1))
+          if 0 <= i+di < G.shape[0] and 0 <= j+dj < G.shape[1] and np.isfinite(G[i+di, j+dj])]
+    if not nb or peak <= gmean:
+        return dict(score=0.0, peak=peak, nbr_mean=float(np.mean(nb)) if nb else float("nan"), verdict="SPIKE")
+    nbr_mean = float(np.mean(nb)); score = float(np.clip((nbr_mean - gmean) / (peak - gmean), 0, 1))
+    return dict(score=score, peak=peak, nbr_mean=nbr_mean, grid_mean=gmean,
+                verdict="RIDGE" if score >= 0.5 else "SPIKE")
