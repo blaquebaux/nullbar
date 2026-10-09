@@ -205,3 +205,30 @@ the next real-returns check to run once their forecast series are persisted.
 data-correction provenance and causal-sieve (cheap, low urgency), the leakage-safe search
 registry and monotone-bar enforcement inside an automated loop (belong to a future
 "base automates discovery" project), and the two new sleeves above.
+
+---
+
+# CONTEXTUAL RESCUE (Oct 9 2026) — the first capstone-phase result
+
+`contextual_rescue.py` answers the question the per-sleeve READMEs can't: a null is a *standalone*
+verdict — does a small dose earn its slot **in a book**? Each overlay is judged against the same 10%
+in bonds (IEF/TLT), on the **tail** (skew, worst month, maxDD), not Sharpe. It must be able to fail.
+
+Run on an equity-tilted keeper book (SPY/QQQ/MTUM/DIVO/MUB/EMB/GLD), 2016–2026:
+
+| overlay (+10%) | Sharpe | maxDD | worst mo | skew | verdict |
+|---|---|---|---|---|---|
+| base keeper book | +1.01 | −26% | −8.6% | −0.35 | — |
+| **bleed / long-vol (VIXM)** | **+1.15** | **−18%** | **−6.0%** | **+0.13** | **RESCUED** |
+| +10% IEF / TLT (control) | +1.02 / +1.01 | −23% / −22% | −7.5% / −8.0% | −0.33 / −0.31 | the bar |
+| bide (cash ladder) | +0.99 | −25% | −8.4% | −0.31 | not rescued (bonds win) |
+| bastion / managed futures (DBMF) | +1.00 | −24% | −7.4% | −0.36 | marginal |
+
+**Finding:** the convex tail hedge is the null that earns its keep — a 10% long-vol overlay raises book
+Sharpe, cuts maxDD by 8 points, and **flips book skew positive**, which bonds cannot do. The patient-cash
+posture (`bide`) is *not* rescued — bonds cut drawdown/worst-month more at equal Sharpe, so it stays
+shelved even in context (the narrative lost to the control). Managed futures is marginal. The long-vol
+win is partly a **rebalancing premium** (trim after spikes, rebuy cheap) — which is exactly what an
+allocator does, and why "in context, rebalanced" ≠ "standalone, buy-and-hold." **The graveyard's value
+is real but conditional:** it shows up in the right layer, rebalanced, at a small dose — not standalone.
+This is the empirical backbone for the preservation capstone.
